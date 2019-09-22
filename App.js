@@ -30,19 +30,22 @@ import modelApi from './modelApi'
 export default class App extends React.Component {
   constructor(props){
     super(props)
+
+    this.state = modelApi.getState()
+
+    modelApi.subscribe(state => this.setState(state))
   }
 
   render() {
-    const state = modelApi.getState()
     return (
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         {
-          state.cameraOpen ? (<Camera {...state}/>)
-          : !state.authenticated ? (<Login {...state}/>)
-          : state.view === 'products' ? (<Products {...state}/>)
-          : state.view === 'settings' ? (<Settings {...state}/>)
-          : state.view === 'warnings' ? (<Warnings {...state}/>)
-          : state.view === 'addProduct' ? (<Warnings {...state}/>)
+          this.state.cameraOpen ? (<Camera {...this.state}/>)
+          : !this.state.authenticated ? (<Login {...this.state}/>)
+          : this.state.view === 'products' ? (<Products {...this.state}/>)
+          : this.state.view === 'settings' ? (<Settings {...this.state}/>)
+          : this.state.view === 'warnings' ? (<Warnings {...this.state}/>)
+          : this.state.view === 'addProduct' ? (<Warnings {...this.state}/>)
           : null
         }
       </TouchableWithoutFeedback>

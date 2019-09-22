@@ -13,6 +13,8 @@ import {
   RNCamera 
 } from 'react-native-camera';
 
+import server from '../../server/serverApi.js'
+
 
 const styles = {
   container: {
@@ -41,27 +43,12 @@ export default class Camera extends React.Component {
 		super(props)
 
     	this.state = {
-    	  barcodes: []
     	}
 	
     	this.addBarcodes = barcodes => {
-    	  const codesNotInState = barcodes.filter(code => true)
-    	  if(codesNotInState.length) {
-    	    this.setState({
-    	      barcodes: [...this.state.barcodes, ...codesNotInState]
-    	    })
-    	  }
-    	}
-	
-    	this.takePicture = () => {
-    	  if (this.camera) {
-    	    this.camera.takePictureAsync({ 
-    	      quality: 0.5, 
-    	      base64: true 
-    	    })
-    	    .then(data => console.log(data.uri))
-    	    .catch(err => console.log(`FAIL: ${err}`))
-    	  }
+    	  Promise.all(barcodes.map(server.scanProduct))
+          .then(res => console.log('res: ', res))
+          .catch(err => console.log('err: ', err))
     	}
 	}
 
@@ -89,7 +76,7 @@ export default class Camera extends React.Component {
     	    />
     	    <View style={{ flex: 0, flexDirection: 'row', justifyContent: 'center' }}>
     	      <TouchableOpacity 
-    	        onPress={this.takePicture} 
+    	        onPress={()=>{}} 
     	        style={styles.capture}
     	      >
     	        <Text style={{ fontSize: 14 }}> SNAP </Text>
