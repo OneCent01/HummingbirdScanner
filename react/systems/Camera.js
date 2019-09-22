@@ -15,6 +15,8 @@ import {
 
 import server from '../../server/serverApi.js'
 
+import modelApi from '../../modelApi.js'
+
 
 const styles = {
   container: {
@@ -46,9 +48,13 @@ export default class Camera extends React.Component {
     	}
 	
     	this.addBarcodes = barcodes => {
-    	  Promise.all(barcodes.map(server.scanProduct))
-          .then(res => console.log('res: ', res))
-          .catch(err => console.log('err: ', err))
+            Promise.all(
+                barcodes.map(
+                    barcodeData => server.scanProduct(barcodeData.data)
+                )
+            )
+            .then(res => console.log('res: ', res))
+            .catch(err => console.log('err: ', err))
     	}
 	}
 
@@ -56,30 +62,33 @@ export default class Camera extends React.Component {
 		return (
     	  <View style={styles.container}>
     	    <RNCamera
-    	      ref={ref => this.camera = ref}
-    	      style={styles.preview}
-    	      type={RNCamera.Constants.Type.back}
-    	      flashMode={RNCamera.Constants.FlashMode.on}
-    	      androidCameraPermissionOptions={{
-    	        title: 'Permission to use camera',
-    	        message: 'We need your permission to use your camera',
-    	        buttonPositive: 'Ok',
-    	        buttonNegative: 'Cancel',
-    	      }}
-    	      androidRecordAudioPermissionOptions={{
-    	        title: 'Permission to use audio recording',
-    	        message: 'We need your permission to use your audio',
-    	        buttonPositive: 'Ok',
-    	        buttonNegative: 'Cancel',
-    	      }}
-    	      onGoogleVisionBarcodesDetected={res => this.addBarcodes(res.barcodes)}
+                ref={ref => this.camera = ref}
+                style={styles.preview}
+                type={RNCamera.Constants.Type.back}
+                flashMode={RNCamera.Constants.FlashMode.on}
+                androidCameraPermissionOptions={{
+                  title: 'Permission to use camera',
+                  message: 'We need your permission to use your camera',
+                  buttonPositive: 'Ok',
+                  buttonNegative: 'Cancel',
+                }}
+                androidRecordAudioPermissionOptions={{
+                  title: 'Permission to use audio recording',
+                  message: 'We need your permission to use your audio',
+                  buttonPositive: 'Ok',
+                  buttonNegative: 'Cancel',
+                }}
+                onGoogleVisionBarcodesDetected={res => {
+                  this.addBarcodes(res.barcodes)
+                  modelApi.dispatch({type: 'CLOSE_CAMERA'})
+                }}
     	    />
     	    <View style={{ flex: 0, flexDirection: 'row', justifyContent: 'center' }}>
     	      <TouchableOpacity 
-    	        onPress={()=>{}} 
+    	        onPress={()=>modelApi.dispatch({type: 'CLOSE_CAMERA'})} 
     	        style={styles.capture}
     	      >
-    	        <Text style={{ fontSize: 14 }}> SNAP </Text>
+    	        <Text style={{ fontSize: 14 }}> Close </Text>
     	      </TouchableOpacity>
     	    </View>
     	  </View>
